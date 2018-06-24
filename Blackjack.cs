@@ -10,62 +10,63 @@ namespace Blackjack_CSharp
     {
         static void Main(string[] args)
         {
-            handOfCards* player = new handOfCards();
-            handOfCards* dealer = new handOfCards();
+            HandOfCards player = new HandOfCards();
+            HandOfCards dealer = new HandOfCards();
             bool gameOver = false;
             bool gotBlackjack = false;
             char playAgain;
             char hitOrStay;
 
-            cout << "Casino Blackjack" << endl;
-            cout << "Dealer hits on soft 17" << endl << endl;
-
+            Console.WriteLine("Casino Blackjack");
+            Console.WriteLine("Dealer hits on soft 17");
+            Console.WriteLine();
+            
             do
             {
                 //deal first two cards to player and dealer
                 for (int i = 0; i < 2; i++)
                 {
-                    player->draw();
-                    dealer->draw();
+                    player.Draw();
+                    dealer.Draw();
                 }
 
                 //check for blackjack
-                if (player->isBlackjack())
+                if (player.IsBlackjack())
                 {
-                    cout << "You got blackjack! You won!" << endl;
+                    Console.WriteLine("You got blackjack! You won!");
                     gameOver = true;
                     gotBlackjack = true;
                 }
-                else if (dealer->isBlackjack())
+                else if (dealer.IsBlackjack())
                 {
-                    cout << "Dealer got blackjack. You lost." << endl;
+                    Console.WriteLine("Dealer got blackjack. You lost.");
                     gameOver = true;
                     gotBlackjack = true;
                 }
 
                 while (!gameOver)
                 {
-                    cout << "Dealer:\t";
-                    dealer->print(true);
-                    cout << "Player:\t";
-                    player->print(false);
+                    Console.WriteLine("Dealer:\t");
+                    dealer.Print(true);
+                    Console.WriteLine("Player:\t");
+                    player.Print(false);
 
                     do
                     {
-                        cout << "Do you want to hit or stay? [H / S]:";
-                        cin >> hitOrStay;
-                        if (tolower(hitOrStay) != 'h' && tolower(hitOrStay) != 's')
-                            cout << "Please enter H or S." << endl;
-                    } while (tolower(hitOrStay) != 'h' && tolower(hitOrStay) != 's');
+                        Console.WriteLine("Do you want to hit or stay? [H / S]:");
+                        hitOrStay = Console.ReadKey().KeyChar;
+                        if (char.ToLower(hitOrStay) != 'h' && char.ToLower(hitOrStay) != 's')
+                            Console.WriteLine("Please enter H or S.");
+                    } while (char.ToLower(hitOrStay) != 'h' && char.ToLower(hitOrStay) != 's');
 
-                    if (tolower(hitOrStay) == 'h')
+                    if (char.ToLower(hitOrStay) == 'h')
                     {
-                        player->draw();
-                        dealer->dealerPlay();
+                        player.Draw();
+                        dealer.DealerPlay();
                     }
                     else
                     {
-                        dealer->dealerPlay();
+                        dealer.DealerPlay();
                         gameOver = true;
                     }
                 }
@@ -74,175 +75,118 @@ namespace Blackjack_CSharp
                 if (!gotBlackjack)
                 {
                     //report final card totals
-                    cout << endl << "Final results:" << endl << endl;
-                    cout << "Dealer: " << dealer->value() << endl;
-                    dealer->print(false);
-                    cout << endl;
-                    cout << "Player: " << player->value() << endl; ;
-                    player->print(false);
-                    cout << endl;
+                    Console.WriteLine("\nFinal Results:\n");
+                    Console.WriteLine("Dealer: " + dealer.ValueHand());
+                    dealer.Print(false);
+                    Console.WriteLine('\n');
+                    Console.WriteLine("Player: " + player.ValueHand());
+                    player.Print(false);
+                    Console.WriteLine('\n');
 
                     //declare winner
-                    if (player->isBlackjack())
-                        cout << "You got blackjack! You won!" << endl;
-                    else if (dealer->isBlackjack())
-                        cout << "Dealer got blackjack. You lost." << endl;
-                    else if (player->value() > 21)
-                        cout << "You bust. You lose." << endl;
-                    else if (dealer->value() > 21)
-                        cout << "Dealer bust. You won!" << endl;
-                    else if (player->value() == dealer->value())
-                        cout << "Draw." << endl;
-                    else if (player->value() > dealer->value())
-                        cout << "You won!" << endl;
+                    if (player.IsBlackjack())
+                        Console.WriteLine("You got blackjack! You won!");
+                    else if (dealer.IsBlackjack())
+                        Console.WriteLine("Dealer got blackjack. You lost.");
+                    else if (player.ValueHand() > 21)
+                        Console.WriteLine("You bust. You lose.");
+                    else if (dealer.ValueHand() > 21)
+                        Console.WriteLine("Dealer bust. You won!");
+                    else if (player.ValueHand() == dealer.ValueHand())
+                        Console.WriteLine("Draw.");
+                    else if (player.ValueHand() > dealer.ValueHand())
+                        Console.WriteLine("You won!");
                     else
-                        cout << "You lost." << endl;
+                        Console.WriteLine("You lost.");
                 }
 
                 //ask if they want to play again
                 do
                 {
-                    cout << endl << "Do you want to play again? [Y/N]";
-                    cin >> playAgain;
-                    if (tolower(playAgain) != 'y' && tolower(playAgain) != 'n')
-                        cout << "Please enter H or S." << endl;
-                } while (tolower(playAgain) != 'y' && tolower(playAgain) != 'n');
+                    Console.WriteLine("\nDo you want to play again? [Y/N]");
+                    playAgain = Console.ReadKey().KeyChar;
+                    if (char.ToLower(playAgain) != 'y' && char.ToLower(playAgain) != 'n')
+                        Console.WriteLine("Please enter H or S.");
+                } while (char.ToLower(playAgain) != 'y' && char.ToLower(playAgain) != 'n');
 
                 //if playing again, reset hands and gameover
-                if (tolower(playAgain) == 'y')
+                if (char.ToLower(playAgain) == 'y')
                 {
-                    player->clear();
-                    dealer->clear();
+                    player.Clear();
+                    dealer.Clear();
                     gameOver = false;
                 }
-            } while (tolower(playAgain) == 'y');
+            } while (char.ToLower(playAgain) == 'y');
         }
     }
 
-    //enum for face cards
-    enum FaceCards
+    public class Card
     {
-        ACE = 1,
-        JACK = 11,
-        QUEEN = 12,
-        KING = 13
-    };
+        public int Type { get; set; }
 
-    ostream &operator <<(ostream &outs, FaceCards card)
-    {
-        switch (card)
+        public override string ToString()
         {
-            case ACE:
-                outs << "Ace";
-                break;
-            case JACK:
-                outs << "Jack";
-                break;
-            case QUEEN:
-                outs << "Queen";
-                break;
-            case KING:
-                outs << "King";
-                break;
-            default:
-                outs << static_cast<int>(card);
-                break;
+            string returnStr;
+
+            if (Type > 2 && Type < 11)
+                returnStr = Type.ToString();
+            else if (Type == 11)
+                returnStr = "Jack";
+            else if (Type == 12)
+                returnStr = "Queen";
+            else if (Type == 13)
+                returnStr = "King";
+            else
+                returnStr = "Ace";
+
+            return returnStr;
         }
 
-        return outs;
-    }
-
-    class card
-    {
-        public:
-	int type;
-        int value;
-        card* link;
-    };
-
-    class handOfCards
-    {
-        private:
-	card* head;
-        card* end;
-
-        card* newCard()
-        {
-            card* temp;
-            temp = new card();
-            temp->link = NULL;
-            temp->type = (rand() % 13) + 1;
-            temp->value = assignValue(temp);
-            return temp;
-        }
-
-        //assigns the values to cards base on the card type
-        int assignValue(card* temp)
+        public int Value()
         {
             int val;
-            FaceCards tempType;
-            tempType = static_cast<FaceCards>(temp->type);
 
-            //assign value of 10 to jack, queen, king
-            //everyone else just gets their card type (1-10)
-            if (tempType == JACK || tempType == QUEEN || tempType == KING)
-                val = 10;
+            //check for jack, queen, king, if so return 10
+            //if not return type
+            if (Type < 11)
+                val = Type;
             else
-                val = temp->type;
+                val = 10;
 
             return val;
         }
+    };
 
-        public:
-	handOfCards()
-        {
-            clear();
-            srand(time(NULL));
-        }
+    public class HandOfCards
+    {
+        List<Card> hand = new List<Card>();
 
-        //clears the hand to play again
-        void clear()
+        private static Random randNum = new Random();
+
+        //clears the hand
+        public void Clear()
         {
-            head = NULL;
-            end = NULL;
+            hand.Clear();
         }
 
         //deals a new card on the hand
-        void draw()
+        public void Draw()
         {
-            card* temp;
-            temp = newCard();
-
-            if (head == NULL)
-            {
-                head = temp;
-                end = temp;
-            }
-            else
-            {
-                end->link = temp;
-                end = temp;
-            }
+            hand.Add(new Card() { Type = randNum.Next(1, 13) });
         }
 
         //adds up the hand
-        int value()
+        public int ValueHand()
         {
             int value = 0;
             int aceCount = 0;
-            card* cur = head;
 
-            while (cur)
+            foreach(Card c in hand)
             {
-                if (cur->type == 1)
-                {
-                    value += 11;
-                    aceCount++;
-                }
-                else
-                    value += cur->value;
+                value += c.Value();
 
-                cur = cur->link;
+                if (c.Type == 1)
+                    aceCount++;
             }
 
             //if we have aces, and counting them all as 11 has us bust,
@@ -257,29 +201,22 @@ namespace Blackjack_CSharp
         }
 
         //print function with flag on whether or not to print dealer first card
-        void print(bool hideDealerCard)
+        public void Print(bool hideDealerCard)
         {
-            card* cur = head;
-            int cardNum = 1;
-            while (cur)
+            foreach (Card c in hand)
             {
-                if (cardNum == 1 && hideDealerCard)
-                    cout << "*\t";
+                if (c == hand.First() && hideDealerCard)
+                    Console.Write("*\t");
                 else
-                    cout << static_cast<FaceCards>(cur->type) << '\t';
-
-                cur = cur->link;
-                cardNum++;
+                    Console.Write(c.ToString() + '\t');
             }
-
-            cout << endl;
         }
 
         //determines if a hand has been dealt blackjack (only run with two cards dealt)
-        bool isBlackjack()
+        public bool IsBlackjack()
         {
             bool blackjack = false;
-            int handValue = head->value + end->value;
+            int handValue = hand.First().Type + hand.Last().Type;
 
             //if the hand is a face card or ten and an ace, the value will be 11
             if (handValue == 11)
@@ -288,33 +225,15 @@ namespace Blackjack_CSharp
             return blackjack;
         }
 
-        //determines if a hand has aces in it
-        bool hasAces()
-        {
-            bool aces = false;
-            card* cur = head;
-
-            while (cur)
-            {
-                if (cur->type == 1)
-                    aces = true;
-
-                cur = cur->link;
-            }
-
-            return aces;
-        }
-
         //plays the dealers hand
-        void dealerPlay()
+        public void DealerPlay()
         {
-            int handValue = value();
-            bool aces = hasAces();
+            int handValue = ValueHand();
 
             if (handValue < 17)
-                this->draw();
-            else if (handValue == 17 && aces)
-                this->draw();
+                Draw();
+            else if (handValue == 17 && hand.Contains(new Card { Type = 1 }))
+                Draw();
         }
     };
 }
