@@ -65,17 +65,16 @@ namespace Blackjack_CSharp
                     if (char.ToLower(hitOrStay) == 'h')
                     {
                         player.Draw();
-                        dealer.DealerPlay();
 
                         if (player.ValueHand() > 21)
                             gameOver = true;
                     }
                     else
-                    {
-                        dealer.DealerPlay();
                         gameOver = true;
-                    }
                 }
+
+                //dealer has his turn
+                dealer.DealerPlay();
 
                 //report final card totals
                 Console.WriteLine("\nFinal Results:\n");
