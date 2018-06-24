@@ -48,21 +48,27 @@ namespace Blackjack_CSharp
                 {
                     Console.WriteLine("Dealer:\t");
                     dealer.Print(true);
+                    Console.WriteLine();
                     Console.WriteLine("Player:\t");
                     player.Print(false);
+                    Console.WriteLine();
 
                     do
                     {
-                        Console.WriteLine("Do you want to hit or stay? [H / S]:");
+                        Console.Write("Do you want to hit or stay? [H / S]:");
                         hitOrStay = Console.ReadKey().KeyChar;
+                        Console.WriteLine();
                         if (char.ToLower(hitOrStay) != 'h' && char.ToLower(hitOrStay) != 's')
-                            Console.WriteLine("Please enter H or S.");
+                            Console.WriteLine("\nPlease enter H or S.");
                     } while (char.ToLower(hitOrStay) != 'h' && char.ToLower(hitOrStay) != 's');
 
                     if (char.ToLower(hitOrStay) == 'h')
                     {
                         player.Draw();
                         dealer.DealerPlay();
+
+                        if (player.ValueHand() > 21)
+                            gameOver = true;
                     }
                     else
                     {
@@ -71,24 +77,20 @@ namespace Blackjack_CSharp
                     }
                 }
 
+                //report final card totals
+                Console.WriteLine("\nFinal Results:\n");
+                Console.WriteLine("Dealer: " + dealer.ValueHand());
+                dealer.Print(false);
+                Console.WriteLine('\n');
+                Console.WriteLine("Player: " + player.ValueHand());
+                player.Print(false);
+                Console.WriteLine('\n');
+
                 //if player or dealer got a blackjack, game was already decided
                 if (!gotBlackjack)
                 {
-                    //report final card totals
-                    Console.WriteLine("\nFinal Results:\n");
-                    Console.WriteLine("Dealer: " + dealer.ValueHand());
-                    dealer.Print(false);
-                    Console.WriteLine('\n');
-                    Console.WriteLine("Player: " + player.ValueHand());
-                    player.Print(false);
-                    Console.WriteLine('\n');
-
                     //declare winner
-                    if (player.IsBlackjack())
-                        Console.WriteLine("You got blackjack! You won!");
-                    else if (dealer.IsBlackjack())
-                        Console.WriteLine("Dealer got blackjack. You lost.");
-                    else if (player.ValueHand() > 21)
+                    if (player.ValueHand() > 21)
                         Console.WriteLine("You bust. You lose.");
                     else if (dealer.ValueHand() > 21)
                         Console.WriteLine("Dealer bust. You won!");
@@ -103,10 +105,12 @@ namespace Blackjack_CSharp
                 //ask if they want to play again
                 do
                 {
-                    Console.WriteLine("\nDo you want to play again? [Y/N]");
+                    Console.Write("\nDo you want to play again? [Y/N]");
                     playAgain = Console.ReadKey().KeyChar;
+                    Console.WriteLine();
                     if (char.ToLower(playAgain) != 'y' && char.ToLower(playAgain) != 'n')
-                        Console.WriteLine("Please enter H or S.");
+                        Console.WriteLine("Please enter Y or N.");
+
                 } while (char.ToLower(playAgain) != 'y' && char.ToLower(playAgain) != 'n');
 
                 //if playing again, reset hands and gameover
@@ -115,6 +119,7 @@ namespace Blackjack_CSharp
                     player.Clear();
                     dealer.Clear();
                     gameOver = false;
+                    gotBlackjack = false;
                 }
             } while (char.ToLower(playAgain) == 'y');
         }
@@ -128,7 +133,7 @@ namespace Blackjack_CSharp
         {
             string returnStr;
 
-            if (Type > 2 && Type < 11)
+            if (Type > 1 && Type < 11)
                 returnStr = Type.ToString();
             else if (Type == 11)
                 returnStr = "Jack";
@@ -148,7 +153,7 @@ namespace Blackjack_CSharp
 
             //check for jack, queen, king, if so return 10
             //if not return type
-            if (Type < 11)
+            if (Type < 10)
                 val = Type;
             else
                 val = 10;
@@ -183,10 +188,13 @@ namespace Blackjack_CSharp
 
             foreach(Card c in hand)
             {
-                value += c.Value();
-
                 if (c.Type == 1)
+                {
+                    value += 11;
                     aceCount++;
+                }
+                else
+                    value += c.Value();
             }
 
             //if we have aces, and counting them all as 11 has us bust,
@@ -216,10 +224,10 @@ namespace Blackjack_CSharp
         public bool IsBlackjack()
         {
             bool blackjack = false;
-            int handValue = hand.First().Type + hand.Last().Type;
+            int handValue = hand.First().Value() + hand.Last().Value();
 
             //if the hand is a face card or ten and an ace, the value will be 11
-            if (handValue == 11)
+            if (handValue == 11 && (hand.First().Value() == 10 || hand.Last().Value() == 10))
                 blackjack = true;
 
             return blackjack;
@@ -230,10 +238,11 @@ namespace Blackjack_CSharp
         {
             int handValue = ValueHand();
 
-            if (handValue < 17)
+            while (handValue < 17 || (handValue == 17 && hand.Contains(new Card { Type = 1 })))
+            {
                 Draw();
-            else if (handValue == 17 && hand.Contains(new Card { Type = 1 }))
-                Draw();
+                handValue = ValueHand();
+            }
         }
     };
 }
